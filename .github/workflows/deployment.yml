@@ -9,18 +9,17 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - name: Prepare ssh directory
-        run: mkdir $HOME/.ssh
-      - name: Add keys
+      - name: Prepare ssh keys
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
         run: |
-          echo $SSH_PUBLIC_KEY > $HOME/.ssh/id_rsa_deploy.pub
-          echo $SSH_PRIVATE_KEY > $HOME/.ssh/id_rsa_deploy
+          echo $SSH_PUBLIC_KEY > id_rsa_deploy.pub
+          echo $SSH_PRIVATE_KEY > id_rsa_deploy
       - name: Deploy
         env:
           SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
         run: |
-          ssh -i $HOME/.ssh/id_rsa_deploy $SSH_USERNAME@$SSH_HOSTNAME 'cd sites/makmonty.com/recipes && git pull'
+          ls
+          ssh -i ./id_rsa_deploy $SSH_USERNAME@$SSH_HOSTNAME 'cd sites/makmonty.com/recipes && git pull'
