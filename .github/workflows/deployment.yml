@@ -16,9 +16,8 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
         run: |
-          mkdir .ssh
-          echo $SSH_PUBLIC_KEY > .ssh/id_rsa.pub
-          pwd
-          cat .ssh/id_rsa.pub
-          echo $SSH_PRIVATE_KEY > .ssh/id_rsa
+          mkdir $HOME/.ssh
+          echo $SSH_PUBLIC_KEY > $HOME/.ssh/id_rsa.pub
+          echo $GOME
+          echo $SSH_PRIVATE_KEY > $HOME/.ssh/id_rsa
           ssh $SSH_USERNAME@$SSH_HOSTNAME 'cd sites/makmonty.com/recipes && git pull'
