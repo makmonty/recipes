@@ -20,5 +20,5 @@ jobs:
           ssh -tt $SSH_USERNAME@$SSH_HOSTNAME 'bash -s' << EOF 
           cd sites/makmonty.com/recipes &&
           git pull &&
-          exit
+          exit && 
           EOF
