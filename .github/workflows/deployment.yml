@@ -5,19 +5,17 @@ on:
     branches:
       - master
 jobs:
-  Deploy:
+  Deployment:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - env:
-          SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
-        run: echo $SSH_HOSTNAME
       - name: Deploy
         env:
           SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
           SSH_USER: ${{ secrets.SSH_USERNAME }}
-          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          SSH_SECRET_KEY: ${{ secrets.SSH_SECRET_KEY }}
         run: |
+          echo $SSH_SECRET_KEY > .ssh/id_rsa
           sh -tt $SSH_USERNAME@$SSH_HOSTNAME -p $SSH_PASSWORD 'bash -s' << EOF
           cd sites/makmonty.com/recipes
           git pull
