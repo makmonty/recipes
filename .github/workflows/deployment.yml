@@ -1,9 +1,13 @@
 name: Deployment
 run-name: ${{ github.actor }} is deploying
-on: [push]
+on:
+  push:
+    branches:
+      - master
 jobs:
   Deploy:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - env:
           SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
