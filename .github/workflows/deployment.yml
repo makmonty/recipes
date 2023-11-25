@@ -16,7 +16,7 @@ jobs:
           SSH_SECRET_KEY: ${{ secrets.SSH_SECRET_KEY }}
         run: |
           echo $SSH_SECRET_KEY > .ssh/id_rsa
-          sh -tt $SSH_USERNAME@$SSH_HOSTNAME -p $SSH_PASSWORD 'bash -s' << EOF
+          ssh -tt $SSH_USERNAME@$SSH_HOSTNAME 'bash -s' << EOF
           cd sites/makmonty.com/recipes
           git pull
           exit
