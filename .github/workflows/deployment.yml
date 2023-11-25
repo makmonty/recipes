@@ -10,6 +10,7 @@ jobs:
           SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
           SSH_USER: ${{ secrets.SSH_USERNAME }}
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        run: echo $SSH_HOSTNAME
         run: |
           sh -tt $SSH_USERNAME@$SSH_HOSTNAME -p $SSH_PASSWORD 'bash -s' << EOF
           cd sites/makmonty.com/recipes
