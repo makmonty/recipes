@@ -12,7 +12,7 @@ jobs:
       - name: Deploy
         env:
           SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
-          SSH_USER: ${{ secrets.SSH_USERNAME }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
           SSH_SECRET_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: >
           mkdir .ssh &&
