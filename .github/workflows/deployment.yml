@@ -13,9 +13,9 @@ jobs:
         env:
           SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
           SSH_USER: ${{ secrets.SSH_USERNAME }}
-          SSH_SECRET_KEY: ${{ secrets.SSH_SECRET_KEY }}
+          SSH_SECRET_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          echo $SSH_SECRET_KEY > .ssh/id_rsa
+          echo $SSH_PRIVATE_KEY > .ssh/id_rsa
           ssh -tt $SSH_USERNAME@$SSH_HOSTNAME 'bash -s' << EOF
           cd sites/makmonty.com/recipes
           git pull
