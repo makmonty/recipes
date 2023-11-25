@@ -15,10 +15,8 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USERNAME }}
           SSH_SECRET_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: >
-          mkdir -p .ssh && 
-          echo $SSH_PRIVATE_KEY > .ssh/id_rsa && 
-          ssh -tt $SSH_USERNAME@$SSH_HOSTNAME 'bash -s' << EOF 
-          cd sites/makmonty.com/recipes &&
+          mkdir -p .ssh &&
+          echo $SSH_PRIVATE_KEY > .ssh/id_rsa &&
+          ssh -tt $SSH_USERNAME@$SSH_HOSTNAME 'cd sites/makmonty.com/recipes &&
           git pull &&
-          exit && 
-          EOF
+          exit'
