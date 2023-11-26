@@ -10,7 +10,7 @@ jobs:
     environment: production
     steps:
       - name: Install dependencies
-        run: apt-get install sshpass
+        run: sudo apt-get install sshpass
       - name: Prepare ssh keys
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
