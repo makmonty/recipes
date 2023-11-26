@@ -21,5 +21,5 @@ jobs:
           SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
         run: |
-          cat id_rsa_deploy.pub | tail -n 1
+          cat id_rsa_deploy.pub | cut -c1-20
           ssh -i ./id_rsa_deploy $SSH_USERNAME@$SSH_HOSTNAME 'cd sites/makmonty.com/recipes && git pull'
