@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
+      - name: Install dependencies
+        run: apt-get install sshpass
       - name: Prepare ssh keys
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -21,4 +23,4 @@ jobs:
           SSH_HOSTNAME: ${{ secrets.SSH_HOSTNAME }}
           SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
         run: |
-          ssh -tt -i ./id_rsa_deploy $SSH_USERNAME@$SSH_HOSTNAME 'cd sites/makmonty.com/recipes && git pull'
+          sshpass -p $SSH_PASSWORD ssh -tt $SSH_USERNAME@$SSH_HOSTNAME 'cd sites/makmonty.com/recipes && git pull'
