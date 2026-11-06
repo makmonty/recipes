@@ -1,0 +1,25 @@
+{
+  "name": "cooklang-recipe-book",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "node --experimental-wasm-modules ./node_modules/astro/bin/astro.mjs dev",
+    "check": "astro check",
+    "test": "node --experimental-wasm-modules --test tests/*.test.ts",
+    "build": "npm run check && node --experimental-wasm-modules ./node_modules/astro/bin/astro.mjs build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@cooklang/cooklang": "0.19.1",
+    "astro": "7.4.7"
+  },
+  "devDependencies": {
+    "@astrojs/check": "latest",
+    "@types/node": "latest",
+    "typescript": "latest"
+  }
+}

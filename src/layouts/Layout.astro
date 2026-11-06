@@ -1,0 +1,38 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = 'Mi libro de recetas',
+  description = 'Recetas simples, buena comida. Una colección personal de recetas escritas en Cooklang.',
+} = Astro.props;
+const home = import.meta.env.BASE_URL;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f6f3eb" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href={home}>
+        <span class="brand-mark" aria-hidden="true">r.</span>
+	<span>Mi libro de recetas</span>
+      </a>
+      <span class="header-note">Desde la cocina, con amor.</span>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer">
+	    <span>Buena comida. Ingredientes simples. Algo que merece ser compartido.</span>
+      <span>Hecho con <a href="https://cooklang.org">Cooklang</a>.</span>
+    </footer>
+  </body>
+</html>

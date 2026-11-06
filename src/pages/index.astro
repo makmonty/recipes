@@ -1,0 +1,109 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { loadRecipes, type Recipe } from '../lib/recipes.ts';
+
+const recipes = await loadRecipes();
+const tags = [...new Set(recipes.flatMap((recipe) => recipe.tags))].sort();
+const base = import.meta.env.BASE_URL;
+const photos = import.meta.glob<string>('/recipes/**/*.{jpg,jpeg}', { eager: true, query: '?url', import: 'default' });
+const photoFor = (recipe: Recipe) => (recipe.image ? photos[`/recipes/${recipe.image}`] : undefined);
+---
+<Layout>
+  <section class="hero">
+    <p class="eyebrow">Una colección para cocinar cada día</p>
+    <h1>Un poco de inspiración.<br />Mucha <em>buena comida.</em></h1>
+    <p class="hero-description">Recetas a las que volver. Desde relajados desayunos de fin de semana hasta rápidas cenas antes de dormir, encuentra algo bueno que hacer hoy.</p>
+    <span class="hero-decoration" aria-hidden="true">Hecho<br /><em>para compartir</em></span>
+  </section>
+
+  <section class="collection" aria-labelledby="collection-title">
+    <div class="collection-heading">
+      <div>
+        <p class="eyebrow">Encuentra tu próximo favorito</p>
+        <h2 id="collection-title">Todas las recetas <span class="recipe-count">{recipes.length}</span></h2>
+      </div>
+      <div class="search-controls" hidden>
+        <label class="sr-only" for="recipe-search">Busca recetas o ingredientes</label>
+        <input id="recipe-search" type="search" placeholder="Busca recetas o ingredientes..." />
+        <label class="sr-only" for="recipe-tag">Filtra por etiqueta</label>
+        <select id="recipe-tag">
+          <option value="">Todas las etiquetas</option>
+          {tags.map((tag) => <option value={tag}>{tag}</option>)}
+        </select>
+      </div>
+    </div>
+    <p class="results-status sr-only" role="status" aria-live="polite"></p>
+    <div class="recipe-grid">
+      {recipes.map((recipe, index) => {
+        const photo = photoFor(recipe);
+        return (
+        <article
+          class="recipe-card"
+          data-search={[recipe.title, recipe.description, ...recipe.tags, ...recipe.ingredients.map((ingredient) => ingredient.name)].join(' ').toLocaleLowerCase()}
+          data-tags={JSON.stringify(recipe.tags)}
+        >
+          <a href={`${base}recipes/${recipe.slug}/`}>
+            {photo ? (
+              <div class="card-art card-photo">
+                <img src={photo} alt={`Foto de ${recipe.title}`} loading="lazy" />
+              </div>
+            ) : (
+              <div class={`card-art art-${index % 3}`} aria-hidden="true">
+                <svg viewBox="0 0 280 180" fill="none">
+                  <ellipse cx="140" cy="98" rx="86" ry="63" class="plate-rim" />
+                  <ellipse cx="140" cy="98" rx="66" ry="48" class="plate" />
+                  <path d="M105 91c22-38 66-20 63 4-3 27-58 38-55 5 3-25 54-30 46-5-8 23-44 14-37 0" class="food" stroke-width="9" stroke-linecap="round" />
+                  <path d="M156 75c-10-23 11-32 17-16 8-16 26-3 4 13m-56 36c-19 7-32-9-16-18" class="herb" stroke-width="7" stroke-linecap="round" />
+                  <circle cx="132" cy="76" r="3" class="seasoning" />
+                  <circle cx="151" cy="116" r="3" class="seasoning" />
+                  <circle cx="169" cy="94" r="3" class="seasoning" />
+                </svg>
+                <span class="art-caption">La cocina diaria</span>
+              </div>
+            )}
+            <div class="card-body">
+              <div class="tags">{recipe.tags.slice(0, 3).map((tag) => <span>{tag}</span>)}</div>
+              <h3>{recipe.title}</h3>
+              <p>{recipe.description || 'Una receta de nuestra cocina a la tuya.'}</p>
+              <div class="card-bottom">
+                <span>{recipe.time || `${recipe.ingredients.length} ingredients`}</span>
+                <span class="card-link">Ver receta <span aria-hidden="true">&rarr;</span></span>
+              </div>
+            </div>
+          </a>
+        </article>
+        );
+      })}
+    </div>
+    <p class="empty-state" hidden>No se ha encontrado ninguna receta. Prueba otro ingrediente o etiqueta.</p>
+    {recipes.length === 0 && <p class="empty-state">Tu libro de recetas está esperando. Añade un archivo .cook al directorio de recetas y recompila.</p>}
+  </section>
+</Layout>
+
+<script>
+  const controls = document.querySelector<HTMLElement>('.search-controls');
+  const search = document.querySelector<HTMLInputElement>('#recipe-search');
+  const tag = document.querySelector<HTMLSelectElement>('#recipe-tag');
+  const cards = [...document.querySelectorAll<HTMLElement>('.recipe-card')];
+  const status = document.querySelector<HTMLElement>('.results-status');
+  const empty = document.querySelector<HTMLElement>('.empty-state[hidden]');
+
+  function filterRecipes() {
+    const query = search?.value.trim().toLocaleLowerCase() || '';
+    const selectedTag = tag?.value || '';
+    let count = 0;
+    for (const card of cards) {
+      const tags: string[] = JSON.parse(card.dataset.tags || '[]');
+      const matches = (card.dataset.search || '').includes(query)
+        && (!selectedTag || tags.includes(selectedTag));
+      card.hidden = !matches;
+      if (matches) count++;
+    }
+    if (status) status.textContent = `${count} ${count === 1 ? 'recipe' : 'recipes'} found.`;
+    if (empty) empty.hidden = count !== 0;
+  }
+
+  if (controls) controls.hidden = false;
+  search?.addEventListener('input', filterRecipes);
+  tag?.addEventListener('change', filterRecipes);
+</script>

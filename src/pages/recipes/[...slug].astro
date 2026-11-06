@@ -1,0 +1,96 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Layout from '../../layouts/Layout.astro';
+import { loadRecipes, type Recipe } from '../../lib/recipes.ts';
+
+export const getStaticPaths = (async () => {
+  const recipes = await loadRecipes();
+  return recipes.map((recipe) => ({ params: { slug: recipe.slug }, props: { recipe } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  recipe: Recipe;
+}
+const { recipe } = Astro.props;
+const photos = import.meta.glob<string>('/recipes/**/*.{jpg,jpeg}', { eager: true, query: '?url', import: 'default' });
+const photo = recipe.image ? photos[`/recipes/${recipe.image}`] : undefined;
+---
+<Layout title={recipe.title} description={recipe.description || `Cómo hacer ${recipe.title}.`}>
+  <article class="recipe-detail">
+    <a class="back-link" href={import.meta.env.BASE_URL}>&larr; Todas las recetas</a>
+    <header class="recipe-header">
+      <div class="tags">{recipe.tags.map((tag) => <span>{tag}</span>)}</div>
+      <h1>{recipe.title}</h1>
+      {recipe.description && <p class="hero-description">{recipe.description}</p>}
+      {photo && (
+        <figure class="recipe-photo">
+          <img src={photo} alt={`Foto de ${recipe.title}`} />
+        </figure>
+      )}
+      <div class="recipe-meta">
+        {recipe.time && <span><strong>Tiempo</strong> {recipe.time}</span>}
+        {recipe.servings && <span><strong>Raciones</strong> {recipe.servings}</span>}
+        <button class="print-button" type="button" hidden>Imprimir receta</button>
+      </div>
+    </header>
+    <div class="recipe-columns">
+      <aside class="ingredients-panel">
+        <p class="eyebrow">Antes de empezar</p>
+        <h2>Ingredientes</h2>
+        <p class="ingredient-hint">Marca los ingredientes a medida que avanzas.</p>
+        <ul class="ingredients-list">
+          {recipe.ingredients.map((ingredient) => (
+            <li>
+              <label>
+                <input type="checkbox" />
+                <span>
+                  <span class="ingredient-name">{ingredient.name}</span>
+                  {ingredient.quantity && <span class="ingredient-quantity">{ingredient.quantity}</span>}
+                  {ingredient.note && <small>{ingredient.note}</small>}
+                  {ingredient.optional && <small>Opcional</small>}
+                </span>
+              </label>
+            </li>
+          ))}
+        </ul>
+        {recipe.cookware.length > 0 && (
+          <div class="cookware">
+            <h3>Lo que necesitarás</h3>
+            <ul>
+              {recipe.cookware.map((item) => (
+                <li>{item.quantity && `${item.quantity} `}{item.name}{item.note && ` (${item.note})`}{item.optional && ' (opcional)'}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </aside>
+      <section class="method" aria-labelledby="method-title">
+        <p class="eyebrow">Manos a la obra</p>
+        <h2 id="method-title">Pasos</h2>
+        {recipe.sections.map((section) => (
+          <section class="method-section">
+            {section.name && <h3>{section.name}</h3>}
+            {section.content.map((content) => content.kind === 'text'
+              ? <p class="recipe-note">{content.text}</p>
+              : (
+                <div class="method-step">
+                  <span class="step-number" aria-label={`Step ${content.number}`}>{content.number}</span>
+                  <p>{content.tokens.map((token) => token.kind === 'text'
+                    ? token.text
+                    : <span class={`inline-${token.kind}`}>{token.text}</span>)}</p>
+                </div>
+              ))}
+          </section>
+        ))}
+      </section>
+    </div>
+  </article>
+</Layout>
+
+<script>
+  const printButton = document.querySelector<HTMLButtonElement>('.print-button');
+  if (printButton) {
+    printButton.hidden = false;
+    printButton.addEventListener('click', () => window.print());
+  }
+</script>
